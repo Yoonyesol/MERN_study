@@ -1,6 +1,7 @@
 import React from "react";
 
 import PlaceList from "../components/PlaceList";
+import { useParams } from "react-router-dom/cjs/react-router-dom.min";
 
 const DUMMY_PLACES = [
   {
@@ -32,7 +33,12 @@ const DUMMY_PLACES = [
 ];
 
 const UserPlaces = (props) => {
-  return <PlaceList items={DUMMY_PLACES} />;
+  const userId = useParams().userId; //url에 부호화된 userId 정보를 액세스할 수 있다
+  const loadedPlaces = DUMMY_PLACES.filter(
+    (place) => place.creatorId === userId
+  );
+
+  return <PlaceList items={loadedPlaces} />;
 };
 
 export default UserPlaces;
