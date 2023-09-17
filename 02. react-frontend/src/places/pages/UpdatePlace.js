@@ -6,7 +6,8 @@ import Button from "../../shared/components/FormElements/Button";
 import {
   VALIDATOR_REQUIRE,
   VALIDATOR_MINLENGTH,
-} from "../../shared/components/util/validators";
+} from "../../shared/util/validators";
+import { useForm } from "../../shared/hooks/form-hook";
 import "./PlaceForm.css";
 
 const DUMMY_PLACES = [
@@ -44,6 +45,25 @@ const UpdatePlace = (props) => {
   //백엔드와 연결하기 전까지 더미데이터 사용, placeId와 동일한 id의 데이터를 가져옴
   const identifiedPlace = DUMMY_PLACES.find((p) => p.id === placeId);
 
+  const [formState, inputHandler] = useForm(
+    {
+      title: {
+        value: identifiedPlace.title,
+        isValid: true,
+      },
+      description: {
+        value: identifiedPlace.description,
+        isValid: true,
+      },
+    },
+    true
+  );
+
+  const placeUpdateSubmitHandler = (e) => {
+    e.preventDefault();
+    console.log(formState.inputs);
+  };
+
   //일치하는 데이터가 없는 경우
   if (!identifiedPlace) {
     return (
@@ -53,16 +73,16 @@ const UpdatePlace = (props) => {
     );
   }
   return (
-    <form className="place-form">
+    <form className="place-form" onSubmit={placeUpdateSubmitHandler}>
       <Input
         id="title"
         element="input"
         label="Title"
         validators={[VALIDATOR_REQUIRE()]}
         errorText="Please enter a valid Title."
-        onInput={() => {}} //새로 추가할 내용, Input 수정 필요
-        value={identifiedPlace.title} //"
-        valid={true} //"
+        onInput={inputHandler}
+        initialValue={formState.inputs.title.value}
+        initialValid={formState.inputs.title.isValid}
       />
       <Input
         id="description"
@@ -70,11 +90,11 @@ const UpdatePlace = (props) => {
         label="Description"
         validators={[VALIDATOR_MINLENGTH(5)]}
         errorText="Please enter a valid description (min. 5 characters)."
-        onInput={() => {}} //새로 추가할 내용, Input 수정 필요
-        value={identifiedPlace.description} //"
-        valid={true} //"
+        onInput={inputHandler}
+        initialValue={formState.inputs.description.value}
+        initialValid={formState.inputs.description.isValid}
       />
-      <Button type="submit" disabled={true}>
+      <Button type="submit" disabled={!formState.isValid}>
         UPDATE PLACE
       </Button>
     </form>

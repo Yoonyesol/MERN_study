@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer } from "react";
 
-import { validate } from "../util/validators";
+import { validate } from "../../util/validators";
 import "./Input.css";
 
 const inputReducer = (state, action) => {
@@ -24,9 +24,9 @@ const inputReducer = (state, action) => {
 
 const Input = (props) => {
   const [inputState, dispatch] = useReducer(inputReducer, {
-    value: props.value || "",
+    value: props.initialValue || "",
     isTouched: false,
-    isValid: props.valid || false,
+    isValid: props.initialValid || false,
   });
 
   //의존성 추출을 위한 객체 배열할당
