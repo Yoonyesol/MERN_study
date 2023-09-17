@@ -6,6 +6,10 @@ const formReducer = (state, action) => {
       let formIsValid = true; //전체 form에 대한 유효성 확인
       for (const inputId in state.inputs) {
         //객체이므로 for in 루프
+        if (!state.inputs[inputId]) {
+          //undefined인지 확인
+          continue;
+        }
         if (inputId === action.inputId) {
           formIsValid = formIsValid && action.isValid; //초기 입력값이 바뀌면 양식은 유효함
         } else {
