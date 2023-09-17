@@ -20,6 +20,11 @@ const formReducer = (state, action) => {
         },
         isValid: formIsValid,
       };
+    case "SET_DATA":
+      return {
+        inputs: action.inputs,
+        isValid: action.formIsValid,
+      };
     default:
       return state;
   }
@@ -42,5 +47,16 @@ export const useForm = (initialInputs, initialFormValidity) => {
     });
   }, []);
 
-  return [formState, inputHandler];
+  //백엔드에서 데이터를 가져오기 전 form은 지워진 상태. 이때 form에 저장된 값과 유효성을 대체할 수 있게 하는 함수
+  const setFormData = useCallback((inputData, formValidity) => {
+    //useCallback: 불필요한 재생성 막기
+    dispatch({
+      type: "SET_DATA",
+      inputs: inputData,
+      formIsValid: formValidity,
+    });
+  }, []);
+
+  //form data를 설정하거나 action을 dispatch할 때마다 setFromData() 호출
+  return [formState, inputHandler, setFormData];
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import Input from "../../shared/components/FormElements/Input";
@@ -40,24 +40,44 @@ const DUMMY_PLACES = [
 ];
 
 const UpdatePlace = (props) => {
+  const [isLoading, setIsLoading] = useState(true);
   const placeId = useParams().placeId; //useParams().placeId => 라우터 뒤의 식별자
 
-  //백엔드와 연결하기 전까지 더미데이터 사용, placeId와 동일한 id의 데이터를 가져옴
-  const identifiedPlace = DUMMY_PLACES.find((p) => p.id === placeId);
-
-  const [formState, inputHandler] = useForm(
+  //백엔드와의 연동을 위해 초기값 비움(데이터를 불러오는 동안 loading을 띄울 예정)
+  const [formState, inputHandler, setFormData] = useForm(
     {
       title: {
-        value: identifiedPlace.title,
-        isValid: true,
+        value: "",
+        isValid: false,
       },
       description: {
-        value: identifiedPlace.description,
-        isValid: true,
+        value: "",
+        isValid: false,
       },
     },
     true
   );
+
+  //백엔드와 연결하기 전까지 더미데이터 사용, placeId와 동일한 id의 데이터를 가져옴
+  const identifiedPlace = DUMMY_PLACES.find((p) => p.id === placeId);
+
+  //무한루프 방지를 위해 useEffect 사용
+  useEffect(() => {
+    setFormData(
+      {
+        title: {
+          value: identifiedPlace.title,
+          isValid: true,
+        },
+        description: {
+          value: identifiedPlace.description,
+          isValid: true,
+        },
+      },
+      true
+    );
+    setIsLoading(false); //초기에는 로딩이 되지만 데이터를 받으면 로딩이 되지 않는다.
+  }, [setFormData, identifiedPlace]);
 
   const placeUpdateSubmitHandler = (e) => {
     e.preventDefault();
@@ -72,6 +92,16 @@ const UpdatePlace = (props) => {
       </div>
     );
   }
+
+  //백엔드 연동을 하지 않았으므로 HTTP 로딩 상태를 처리할 수 없는 문제를 해결하기 위한 임시방편 코드
+  if (isLoading) {
+    return (
+      <div className="center">
+        <h2>Loading...</h2>
+      </div>
+    );
+  }
+
   return (
     <form className="place-form" onSubmit={placeUpdateSubmitHandler}>
       <Input
