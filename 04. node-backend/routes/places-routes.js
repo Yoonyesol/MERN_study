@@ -9,5 +9,7 @@ router.get("/:pid", placesControllers.getPlaceById);
 
 router.get("/user/:uid", placesControllers.getPlaceByUserId);
 
+router.post("/", placesControllers.createPlace);
+
 //해당 파일에서 내보내는 건 router라는 상수이다.
 module.exports = router;

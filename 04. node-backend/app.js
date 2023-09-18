@@ -5,6 +5,9 @@ const placesRoutes = require("./routes/places-routes");
 
 const app = express();
 
+//본문을 먼저 파싱->본문의 json 데이터를 추출해서 객체나배열같이 일반적인 js 구조로 변환
+app.use(bodyParser.json());
+
 //경로가 /api/places로 시작된다면 placesRoutes 실행
 app.use("/api/places", placesRoutes);
 

@@ -1,3 +1,7 @@
+const { v4: uuid } = require("uuid");
+
+const HttpError = require("../models/http-error");
+
 const DUMMY_PLACES = [
   {
     id: "p1",
@@ -26,8 +30,6 @@ const DUMMY_PLACES = [
     creatorId: "u2",
   },
 ];
-
-const HttpError = require("../models/http-error");
 
 const getPlaceById = (req, res, next) => {
   //url에 인코딩된 id를 가져오기
@@ -59,5 +61,24 @@ const getPlaceByUserId = (req, res, next) => {
   res.json({ user });
 };
 
+const createPlace = (req, res, next) => {
+  //들어오는 요청에서 데이터 추출
+  const { title, description, coordinates, address, creatorId } = req.body;
+  const createdPlace = {
+    id: uuid(),
+    title,
+    description,
+    location: coordinates,
+    address: address,
+    creatorId,
+  };
+
+  DUMMY_PLACES.push(createdPlace); //unshift(createPlace)
+
+  //새롭게 등록할 것이 있을 때는 201이 관례
+  res.status(201).json({ place: createdPlace });
+};
+
 exports.getPlaceById = getPlaceById;
 exports.getPlaceByUserId = getPlaceByUserId;
+exports.createPlace = createPlace;
