@@ -11,5 +11,9 @@ router.get("/user/:uid", placesControllers.getPlaceByUserId);
 
 router.post("/", placesControllers.createPlace);
 
+router.patch("/:pid", placesControllers.updatePlace);
+
+router.delete("/:pid", placesControllers.deletePlace);
+
 //해당 파일에서 내보내는 건 router라는 상수이다.
 module.exports = router;
