@@ -2,12 +2,11 @@ const express = require("express");
 
 const placesControllers = require("../controllers/places-controller");
 
-const router = express.Router(); //특수 객체 생성
+const router = express.Router();
 
-//라우트, 라우트에 요청이 도달하면 실행되어야 하는 함수
 router.get("/:pid", placesControllers.getPlaceById);
 
-router.get("/user/:uid", placesControllers.getPlaceByUserId);
+router.get("/user/:uid", placesControllers.getPlacesByUserId);
 
 router.post("/", placesControllers.createPlace);
 
@@ -15,5 +14,4 @@ router.patch("/:pid", placesControllers.updatePlace);
 
 router.delete("/:pid", placesControllers.deletePlace);
 
-//해당 파일에서 내보내는 건 router라는 상수이다.
 module.exports = router;

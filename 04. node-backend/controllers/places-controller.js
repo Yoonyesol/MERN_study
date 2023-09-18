@@ -48,17 +48,17 @@ const getPlaceById = (req, res, next) => {
   res.json({ place: place }); //원하는 객체를 전달
 };
 
-const getPlaceByUserId = (req, res, next) => {
+const getPlacesByUserId = (req, res, next) => {
   const userId = req.params.uid;
 
-  const user = DUMMY_PLACES.find((u) => {
+  const places = DUMMY_PLACES.filter((u) => {
     return u.creatorId === userId;
   });
 
-  if (!user) {
-    return next(new HttpError("해당 ID의 유저를 찾지 못했습니다.", 404));
+  if (!places || places.length === 0) {
+    return next(new HttpError("해당 유저ID의 장소를 찾지 못했습니다.", 404));
   }
-  res.json({ user });
+  res.json({ places });
 };
 
 const createPlace = (req, res, next) => {
@@ -101,7 +101,7 @@ const deletePlace = (req, res, next) => {
 };
 
 exports.getPlaceById = getPlaceById;
-exports.getPlaceByUserId = getPlaceByUserId;
+exports.getPlacesByUserId = getPlacesByUserId;
 exports.createPlace = createPlace;
 exports.updatePlace = updatePlace;
 exports.deletePlace = deletePlace;
