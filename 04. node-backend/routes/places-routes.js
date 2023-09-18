@@ -34,13 +34,22 @@ const DUMMY_PLACES = [
 //라우트, 라우트에 요청이 도달하면 실행되어야 하는 함수
 router.get("/:pid", (req, res, next) => {
   //url에 인코딩된 id를 가져오기
-  const placeId = req.params.pid;
+  const placeId = req.params.pid; //{pid:'p1'}
 
   //원하는 id값의 장소만 추출
   const place = DUMMY_PLACES.find((p) => {
     return p.id === placeId;
   });
   res.json({ place: place }); //원하는 객체를 전달
+});
+
+router.get("/user/:uid", (req, res, next) => {
+  const userId = req.params.uid;
+
+  const user = DUMMY_PLACES.find((u) => {
+    return u.creatorId === userId;
+  });
+  res.json({ user });
 });
 
 //해당 파일에서 내보내는 건 router라는 상수이다.
