@@ -40,6 +40,14 @@ router.get("/:pid", (req, res, next) => {
   const place = DUMMY_PLACES.find((p) => {
     return p.id === placeId;
   });
+
+  //place를 찾지 못한 경우 에러 핸들링
+  //비동기 코드가 존재하는 경우 next에 오류를 전달하는 방식으로 에러 처리
+  if (!place) {
+    const error = new Error("해당 ID에 대한 장소를 찾지 못했습니다.");
+    error.code = 404; //오류 상태
+    throw error;
+  }
   res.json({ place: place }); //원하는 객체를 전달
 });
 
@@ -49,6 +57,12 @@ router.get("/user/:uid", (req, res, next) => {
   const user = DUMMY_PLACES.find((u) => {
     return u.creatorId === userId;
   });
+
+  if (!user) {
+    const error = new Error("해당 ID의 유저를 찾지 못했습니다.");
+    error.code = 404; //오류 상태
+    return next(error);
+  }
   res.json({ user });
 });
 
