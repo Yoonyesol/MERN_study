@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const placesRoutes = require("./routes/places-routes");
+const HttpError = require("./models/http-error");
 
 const app = express();
 
@@ -10,6 +11,12 @@ app.use(bodyParser.json());
 
 //경로가 /api/places로 시작된다면 placesRoutes 실행
 app.use("/api/places", placesRoutes);
+
+//앞선 routes 중 응답을 전송하지 않았을 때만 실행
+app.use((req, res, next) => {
+  const error = new HttpError("라우트를 찾지 못했습니다.", 404);
+  throw error; //동기 방식으로 코드가 실행되므로 throw 사용
+});
 
 //매개변수 4개: 오류 처리 미들웨어 함수
 //앞의 미들웨어 함수에서 오류가 발생했을 때만 실행된다.
