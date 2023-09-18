@@ -1,5 +1,7 @@
 const express = require("express");
 
+const HttpError = require("../models/http-error");
+
 const router = express.Router(); //특수 객체 생성
 
 const DUMMY_PLACES = [
@@ -44,9 +46,7 @@ router.get("/:pid", (req, res, next) => {
   //place를 찾지 못한 경우 에러 핸들링
   //비동기 코드가 존재하는 경우 next에 오류를 전달하는 방식으로 에러 처리
   if (!place) {
-    const error = new Error("해당 ID에 대한 장소를 찾지 못했습니다.");
-    error.code = 404; //오류 상태
-    throw error;
+    throw new HttpError("해당 ID에 대한 장소를 찾지 못했습니다.", 404);
   }
   res.json({ place: place }); //원하는 객체를 전달
 });
@@ -59,9 +59,7 @@ router.get("/user/:uid", (req, res, next) => {
   });
 
   if (!user) {
-    const error = new Error("해당 ID의 유저를 찾지 못했습니다.");
-    error.code = 404; //오류 상태
-    return next(error);
+    return next(new HttpError("해당 ID의 유저를 찾지 못했습니다.", 404));
   }
   res.json({ user });
 });
