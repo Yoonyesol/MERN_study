@@ -1,4 +1,5 @@
 const { v4: uuid } = require("uuid");
+const { validationResult } = require("express-validator");
 
 const HttpError = require("../models/http-error");
 
@@ -11,10 +12,14 @@ const getUsers = (req, res, next) => {
 };
 
 const signup = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new HttpError("입력하지 않은 데이터가 존재합니다.", 422);
+  }
+
   const { name, email, password } = req.body;
 
   const hasUser = DUMMY_USERS.find((u) => u.email === email);
-
   if (hasUser) {
     throw new HttpError("이미 등록된 이메일이 존재합니다.", 422);
   }

@@ -80,6 +80,10 @@ const createPlace = (req, res, next) => {
 };
 
 const updatePlace = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new HttpError("입력하지 않은 데이터가 존재합니다.", 422);
+  }
   const { title, description } = req.body;
   const placeId = req.params.pid;
 
@@ -95,6 +99,9 @@ const updatePlace = (req, res, next) => {
 
 const deletePlace = (req, res, next) => {
   const placeId = req.params.pid;
+  if (DUMMY_PLACES.find((p) => p.id !== placeId)) {
+    throw new HttpError("id에 해당하는 장소가 없습니다.", 404);
+  }
   DUMMY_PLACES = DUMMY_PLACES.filter((p) => p.id !== placeId);
 
   res.status(200).json({ message: "Deleted place", placeId });
