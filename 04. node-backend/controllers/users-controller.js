@@ -25,7 +25,7 @@ const signup = async (req, res, next) => {
     return next(new HttpError("유효하지 않은 데이터가 존재합니다.", 422));
   }
 
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
 
   let existingUser;
   try {
@@ -46,7 +46,7 @@ const signup = async (req, res, next) => {
     image:
       "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg",
     password,
-    places,
+    places: [], //새 장소가 추가되면 자동으로 배열에 추가
   });
 
   try {

@@ -13,7 +13,8 @@ const placeSchema = new Schema({
     lat: { type: Number, required: true },
     lng: { type: Number, required: true },
   },
-  creatorId: { type: String, required: true },
+  //mongoose.Types.ObjectId: 생성한 사용자에 대한 실제 id 생성
+  creatorId: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
 });
 
 //모델 생성
