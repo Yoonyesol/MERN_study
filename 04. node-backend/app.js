@@ -1,5 +1,8 @@
+require("dotenv").config();
+
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
 const placesRoutes = require("./routes/places-routes");
 const usersRoute = require("./routes/users-routes");
@@ -26,4 +29,14 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "정의되지 않은 에러 발생" });
 });
 
-app.listen(5000);
+mongoose
+  .connect(
+    `mongodb+srv://user03:${process.env.DB_PW}@cluster0.mqq5hvg.mongodb.net/places?retryWrites=true&w=majority`
+  )
+  .then(() => {
+    //db 연결이 성공할 경우 서버 연결
+    app.listen(5000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
