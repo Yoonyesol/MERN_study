@@ -11,10 +11,10 @@ const placeSchema = new Schema({
   address: { type: String, required: true },
   location: {
     lat: { type: Number, required: true },
-    lan: { type: Number, required: true },
+    lng: { type: Number, required: true },
   },
   creatorId: { type: String, required: true },
 });
 
 //모델 생성
-mondel.exports = mongoose.model("Place", placeSchema);
+module.exports = mongoose.model("Place", placeSchema);

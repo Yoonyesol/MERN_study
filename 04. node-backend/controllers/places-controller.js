@@ -3,6 +3,7 @@ const { validationResult } = require("express-validator");
 
 const HttpError = require("../models/http-error");
 const getCoordsForAddress = require("../util/location");
+const Place = require("../models/place"); //Place 모델 사용가능
 
 let DUMMY_PLACES = [
   {
@@ -73,16 +74,23 @@ const createPlace = async (req, res, next) => {
     return next(error);
   }
 
-  const createdPlace = {
-    id: uuid(),
+  //모델 생성 완료
+  const createdPlace = new Place({
     title,
     description,
+    address,
     location: coordinates,
-    address: address,
+    image:
+      "https://lh3.googleusercontent.com/p/AF1QipPyuJVRazIvc5q3tBMmbrH25HHWvIwh8zsc9Tmn=s680-w680-h510",
     creatorId,
-  };
+  });
 
-  DUMMY_PLACES.push(createdPlace);
+  try {
+    await createdPlace.save(); //db에 저장, 고유 id 생성
+  } catch (err) {
+    const error = new HttpError("장소 저장 실패", 500);
+    return next(error);
+  }
 
   res.status(201).json({ place: createdPlace });
 };
