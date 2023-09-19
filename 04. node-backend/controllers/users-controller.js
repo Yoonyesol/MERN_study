@@ -55,13 +55,27 @@ const signup = async (req, res, next) => {
   res.status(201).json({ user: createdUser.toObject({ getters: true }) });
 };
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  const identifiedUser = DUMMY_USERS.find((u) => u.email === email);
-  if (!identifiedUser || identifiedUser.password !== password) {
-    throw new HttpError("로그인 정보가 일치하지 않습니다.", 401);
+  //이메일이 존재하는지 검증
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (err) {
+    const error = new HttpError("로그인에 실패했습니다", 500);
+    return next(error);
   }
+
+  //이메일 존재 여부, 아이디-비밀번호가 일치하는지 검사
+  if (!existingUser || existingUser.password !== password) {
+    const error = new HttpError(
+      "이메일 혹은 비밀번호가 일치하지 않습니다.",
+      401
+    );
+    return next(error);
+  }
+
   res.json({ message: "로그인 성공!" });
 };
 
