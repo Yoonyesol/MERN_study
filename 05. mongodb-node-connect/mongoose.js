@@ -25,4 +25,12 @@ const createProduct = async (req, res, next) => {
   res.json(result);
 };
 
+const getProducts = async (req, res, next) => {
+  //프로미스로 만들기 위해 exec 추가
+  const products = await Product.find().exec();
+
+  res.json(products);
+};
+
 exports.createProduct = createProduct;
+exports.getProducts = getProducts;
