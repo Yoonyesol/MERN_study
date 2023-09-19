@@ -8,8 +8,15 @@ const DUMMY_USERS = [
   { id: "u1", name: "john", email: "test@google.com", password: "123456" },
 ];
 
-const getUsers = (req, res, next) => {
-  res.json({ users: DUMMY_USERS });
+const getUsers = async (req, res, next) => {
+  let users;
+  try {
+    users = await User.find({}, "-password");
+  } catch (err) {
+    const error = new HttpError("유저 정보를 가져오는 데 실패했습니다.", 500);
+    return next(error);
+  }
+  res.json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
 const signup = async (req, res, next) => {
