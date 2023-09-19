@@ -108,7 +108,7 @@ const createPlace = async (req, res, next) => {
   res.status(201).json({ place: createdPlace });
 };
 
-const updatePlace = (req, res, next) => {
+const updatePlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new HttpError("입력하지 않은 데이터가 존재합니다.", 422);
@@ -116,14 +116,28 @@ const updatePlace = (req, res, next) => {
   const { title, description } = req.body;
   const placeId = req.params.pid;
 
-  const updatedPlace = { ...DUMMY_PLACES.find((p) => p.id === placeId) }; //복사
-  const placeIndex = DUMMY_PLACES.findIndex((p) => p.id === placeId);
-  updatedPlace.title = title;
-  updatedPlace.description = description;
+  //id로 해당 장소 불러오기
+  let place;
+  try {
+    place = await Place.findById(placeId);
+  } catch (err) {
+    const error = new HttpError("장소를 업데이트 할 수 없습니다.", 500);
+    return next(error);
+  }
 
-  DUMMY_PLACES[placeIndex] = updatedPlace;
+  //내용 업데이트
+  place.title = title;
+  place.description = description;
 
-  res.status(200).json({ place: updatedPlace });
+  //업데이트된 정보를 db에 저장
+  try {
+    await place.save();
+  } catch (err) {
+    const error = new HttpError("업데이트에 실패했습니다.", 500);
+    return next(error);
+  }
+
+  res.status(200).json({ place: place.toObject({ getters: true }) });
 };
 
 const deletePlace = (req, res, next) => {
