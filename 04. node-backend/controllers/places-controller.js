@@ -140,14 +140,28 @@ const updatePlace = async (req, res, next) => {
   res.status(200).json({ place: place.toObject({ getters: true }) });
 };
 
-const deletePlace = (req, res, next) => {
+const deletePlace = async (req, res, next) => {
   const placeId = req.params.pid;
-  if (DUMMY_PLACES.find((p) => p.id !== placeId)) {
-    throw new HttpError("id에 해당하는 장소가 없습니다.", 404);
-  }
-  DUMMY_PLACES = DUMMY_PLACES.filter((p) => p.id !== placeId);
 
-  res.status(200).json({ message: "Deleted place", placeId });
+  //id로 해당 장소 검색
+  let place;
+  try {
+    place = await Place.findById(placeId);
+  } catch (err) {
+    const error = new HttpError("삭제할 장소를 찾지 못했습니다.", 500);
+    return next(error);
+  }
+
+  //장소 삭제
+  try {
+    //몽고3.2 이후에는 deleteOne, deleteMany로 대체
+    await place.deleteOne({ id: placeId });
+  } catch (err) {
+    const error = new HttpError("장소를 삭제하지 못했습니다.", 500);
+    return next(error);
+  }
+
+  res.status(200).json({ message: "삭제 완료", placeId });
 };
 
 exports.getPlaceById = getPlaceById;
