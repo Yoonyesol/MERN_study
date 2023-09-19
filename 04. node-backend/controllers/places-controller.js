@@ -177,16 +177,30 @@ const deletePlace = async (req, res, next) => {
   //id로 해당 장소 검색
   let place;
   try {
-    place = await Place.findById(placeId);
+    //populate: 다른 컬렉션의 문서를 참조하고 그 컬렉션에 있는 다른 기존 문서의 데이터를 가지고 작업할 수 있다.
+    //몽구스가 creatorId를 가지고 사용자 데이터 전체를 대상으로 검색한다. 이 id를 가지고 사용자를 찾아내고 그 사용자의 문서에 저장된 모든 데이터를 가져올 수 있다.
+    place = await Place.findById(placeId).populate("creatorId");
   } catch (err) {
     const error = new HttpError("삭제할 장소를 찾지 못했습니다.", 500);
     return next(error);
   }
 
+  //장소가 없을 경우
+  if (!place) {
+    const error = new HttpError("해당 id의 장소를 찾지 못했습니다.", 404);
+    return next(error);
+  }
+
   //장소 삭제
   try {
-    //몽고3.2 이후에는 deleteOne, deleteMany로 대체
-    await place.deleteOne({ id: placeId });
+    //사용자 문서에서 장소 삭제
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await place.deleteOne({ session: sess }); //몽고3.2 이후에는 deleteOne, deleteMany로 대체
+    place.creatorId.places.pull(place); //pull을 이용해 place호출, 자동으로 id제거
+    //새로 생성된 사용자를 db에 저장
+    await place.creatorId.save({ session: sess });
+    await sess.commitTransaction();
   } catch (err) {
     const error = new HttpError("장소를 삭제하지 못했습니다.", 500);
     return next(error);
