@@ -34,30 +34,43 @@ let DUMMY_PLACES = [
   },
 ];
 
-const getPlaceById = (req, res, next) => {
+const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
 
-  const place = DUMMY_PLACES.find((p) => {
-    return p.id === placeId;
-  });
-
-  if (!place) {
-    throw new HttpError("해당 ID에 대한 장소를 찾지 못했습니다.", 404);
+  let place;
+  try {
+    place = await Place.findById(placeId);
+  } catch (err) {
+    //GET 요청에 문제가 생겼을 때의 오류
+    const error = new HttpError("장소를 찾지 못했습니다.", 500);
+    return next(error);
   }
-  res.json({ place: place });
+
+  //GET 요청에는 문제가 없지만 장소가 없을 경우
+  if (!place) {
+    const error = new HttpError("해당 ID에 대한 장소를 찾지 못했습니다.", 404);
+    return next(error); //오류 발생 시 코드 실행 중단
+  }
+  res.json({ place: place.toObject({ getters: true }) });
 };
 
-const getPlacesByUserId = (req, res, next) => {
+const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
 
-  const places = DUMMY_PLACES.filter((u) => {
-    return u.creatorId === userId;
-  });
+  let places;
+  try {
+    places = await Place.find({ creatorId: userId });
+  } catch (err) {
+    const error = new HttpError("해당 유저ID의 장소를 찾지 못했습니다.", 500);
+    return next(error);
+  }
 
   if (!places || places.length === 0) {
     return next(new HttpError("해당 유저ID의 장소를 찾지 못했습니다.", 404));
   }
-  res.json({ places });
+  res.json({
+    places: places.map((place) => place.toObject({ getters: true })),
+  });
 };
 
 const createPlace = async (req, res, next) => {
