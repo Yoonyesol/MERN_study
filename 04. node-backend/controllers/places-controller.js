@@ -1,9 +1,11 @@
 const { v4: uuid } = require("uuid");
 const { validationResult } = require("express-validator");
+const mongoose = require("mongoose");
 
 const HttpError = require("../models/http-error");
 const getCoordsForAddress = require("../util/location");
 const Place = require("../models/place"); //Place 모델 사용가능
+const User = require("../models/user");
 
 let DUMMY_PLACES = [
   {
@@ -98,8 +100,37 @@ const createPlace = async (req, res, next) => {
     creatorId,
   });
 
+  let user;
+  //creatorId의 존재 여부 확인
   try {
-    await createdPlace.save(); //db에 저장, 고유 id 생성
+    user = await User.findById(creatorId);
+  } catch (err) {
+    const error = new HttpError("creatorId가 존재하지 않습니다.", 500);
+    return next(error);
+  }
+
+  //해당 사용자의 존재 여부 확인
+  if (!user) {
+    const error = new HttpError(
+      "주어진 id에 해당하는 사용자가 존재하지 않습니다.",
+      500
+    );
+    return next(error);
+  }
+
+  console.log(user);
+
+  try {
+    //새로운 장소를 생성할 때 시작하는 현재 세션
+    //세션이 존재하면 트랜잭션 시작 가능
+    const sess = await mongoose.startSession();
+    sess.startTransaction(); //db에게 뭘 할 건지를 알려줄 수 있게 됨
+    await createdPlace.save({ session: sess }); //새로운 장소 생성. 자동으로 장소의 고유 id 생성
+    //장소id를 사용자 문서에 추가
+    user.places.push(createdPlace); //push(): mongoose내부에서 우리가 참조하는 두 개의 모델을 연결
+    //업데이트한 문서를 저장
+    await user.save({ session: sess });
+    await sess.commitTransaction(); //세션이 트랜잭션을 커밋하게 한다.
   } catch (err) {
     const error = new HttpError("장소 저장 실패", 500);
     return next(error);
