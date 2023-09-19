@@ -27,7 +27,23 @@ const createProduct = async (req, res, next) => {
   res.json(newProduct);
 };
 
-const getProducts = async (req, res, next) => {};
+const getProducts = async (req, res, next) => {
+  const client = new MongoClient(url);
+
+  let products;
+
+  try {
+    await client.connect();
+    const db = client.db();
+    //찾은 문서를 배열 형식으로 가지고 옴
+    products = await db.collection("products").find().toArray();
+  } catch (error) {
+    return res.json({ message: "상품 찾기 실패" });
+  }
+  client.close();
+
+  res.json(products);
+};
 
 exports.createProduct = createProduct;
 exports.getProducts = getProducts;
