@@ -62,12 +62,37 @@ const Auth = () => {
 
   const authSubmitHandler = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     if (isLoginMode) {
+      try {
+        const response = await fetch("http://localhost:5000/api/users/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json", //json데이터를 받고 있음을 명시
+          },
+          body: JSON.stringify({
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }),
+        });
+
+        const responseData = await response.json();
+        if (!response.ok) {
+          throw new Error(responseData.message);
+        }
+        setIsLoading(false);
+        auth.login();
+      } catch (err) {
+        setIsLoading(false);
+        setError(
+          err.message ||
+            "회원가입 진행 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
+        );
+      }
     } else {
       //로그인 모드가 아닐 때
       try {
-        setIsLoading(true);
         const response = await fetch("http://localhost:5000/api/users/signup", {
           method: "POST",
           headers: {
