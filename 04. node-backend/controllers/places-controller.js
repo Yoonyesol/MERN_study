@@ -59,19 +59,23 @@ const getPlaceById = async (req, res, next) => {
 const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
 
-  let places;
+  //let places;
+  let userWithPlaces;
   try {
-    places = await Place.find({ creatorId: userId });
+    //특정 사용자 id를 검색해 해당하는 장소를 확인. populate인자의 저장소에 접근가능
+    userWithPlaces = await User.findById(userId).populate("places");
   } catch (err) {
     const error = new HttpError("해당 유저ID의 장소를 찾지 못했습니다.", 500);
     return next(error);
   }
 
-  if (!places || places.length === 0) {
+  if (!userWithPlaces || userWithPlaces.places.length === 0) {
     return next(new HttpError("해당 유저ID의 장소를 찾지 못했습니다.", 404));
   }
   res.json({
-    places: places.map((place) => place.toObject({ getters: true })),
+    places: userWithPlaces.places.map((place) =>
+      place.toObject({ getters: true })
+    ),
   });
 };
 
