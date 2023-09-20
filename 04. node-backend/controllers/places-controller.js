@@ -1,4 +1,3 @@
-const { v4: uuid } = require("uuid");
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
 
@@ -53,7 +52,7 @@ const getPlacesByUserId = async (req, res, next) => {
 const createPlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return next(HttpError("입력하지 않은 데이터가 존재합니다.", 422));
+    return next(new HttpError("입력하지 않은 데이터가 존재합니다.", 422));
   }
   const { title, description, address, creatorId } = req.body;
 

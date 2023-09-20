@@ -65,7 +65,7 @@ const Auth = () => {
     if (isLoginMode) {
       try {
         //auth.login()이 항상 호출되지 않도록 처리
-        await sendRequest(
+        const responseData = await sendRequest(
           "http://localhost:5000/api/users/login",
           "POST",
           JSON.stringify({
@@ -76,12 +76,12 @@ const Auth = () => {
             "Content-Type": "application/json", //json데이터를 받고 있음을 명시
           }
         );
-        auth.login();
+        auth.login(responseData.user.id);
       } catch (err) {} //hook에서 에러처리하므로 빈 상태로 놔둬도 됨
     } else {
       //로그인 모드가 아닐 때
       try {
-        await sendRequest(
+        const responseData = await sendRequest(
           "http://localhost:5000/api/users/signup",
           "POST",
           JSON.stringify({
