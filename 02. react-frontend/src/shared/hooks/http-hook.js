@@ -23,15 +23,22 @@ export const useHttpClient = () => {
         });
         const responseData = await response.json();
 
+        //사용한 요청 컨트롤러 제거 - 요청에 사용된 컨트롤러 외 나머지 컨트롤러는 그대로 유지됨
+        activeHttpRequests.current = activeHttpRequests.current.filter(
+          (reqCtrl) => reqCtrl !== httpAbortCtrl
+        );
+
         if (!response.ok) {
           throw new Error(responseData.message);
         }
 
+        setIsLoading(false);
         return responseData;
       } catch (err) {
         setError(err.message);
+        setIsLoading(false);
+        throw err;
       }
-      setIsLoading(false);
     },
     []
   );
@@ -43,9 +50,7 @@ export const useHttpClient = () => {
   useEffect(() => {
     return () => {
       //연결 요청 취소(클린업 요청), 모든 AbortCtrl확인
-      activeHttpRequests.current.forEach((abortCtrl) =>
-        abortCtrl.abortCtrl().abort()
-      );
+      activeHttpRequests.current.forEach((abortCtrl) => abortCtrl.abort());
     };
   }, []);
 

@@ -11,14 +11,14 @@ import {
   VALIDATOR_REQUIRE,
 } from "../../shared/util/validators";
 import { useForm } from "../../shared/hooks/form-hook";
+import { useHttpClient } from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/context/auth-context";
 import "./Auth.css";
 
 const Auth = () => {
   const auth = useContext(AuthContext); //Auth 컨텍스트에 접근
   const [isLoginMode, setIsLoginMode] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState();
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
   const [formState, inputHandler, setFormData] = useForm(
     {
@@ -33,7 +33,6 @@ const Auth = () => {
     },
     false
   );
-
   const switchModeHandler = () => {
     if (!isLoginMode) {
       setFormData(
@@ -62,77 +61,47 @@ const Auth = () => {
 
   const authSubmitHandler = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
 
     if (isLoginMode) {
       try {
-        const response = await fetch("http://localhost:5000/api/users/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json", //json데이터를 받고 있음을 명시
-          },
-          body: JSON.stringify({
+        //auth.login()이 항상 호출되지 않도록 처리
+        await sendRequest(
+          "http://localhost:5000/api/users/login",
+          "POST",
+          JSON.stringify({
             email: formState.inputs.email.value,
             password: formState.inputs.password.value,
           }),
-        });
-
-        const responseData = await response.json();
-        if (!response.ok) {
-          throw new Error(responseData.message);
-        }
-        setIsLoading(false);
-        auth.login();
-      } catch (err) {
-        setIsLoading(false);
-        setError(
-          err.message ||
-            "회원가입 진행 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
+          {
+            "Content-Type": "application/json", //json데이터를 받고 있음을 명시
+          }
         );
-      }
+        auth.login();
+      } catch (err) {} //hook에서 에러처리하므로 빈 상태로 놔둬도 됨
     } else {
       //로그인 모드가 아닐 때
       try {
-        const response = await fetch("http://localhost:5000/api/users/signup", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json", //json데이터를 받고 있음을 명시
-          },
-          body: JSON.stringify({
+        await sendRequest(
+          "http://localhost:5000/api/users/signup",
+          "POST",
+          JSON.stringify({
             //인증을 위해 전송할 내용
             name: formState.inputs.name.value,
             email: formState.inputs.email.value,
             password: formState.inputs.password.value,
           }),
-        });
-
-        const responseData = await response.json();
-
-        //상태코드가 200번대가 아닐 때
-        if (!response.ok) {
-          throw new Error(responseData.message);
-        }
-        console.log(responseData);
-        setIsLoading(false);
-        auth.login();
-      } catch (err) {
-        console.log(err);
-        setIsLoading(false);
-        setError(
-          err.message ||
-            "회원가입 진행 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
+          {
+            "Content-Type": "application/json", //json데이터를 받고 있음을 명시
+          }
         );
-      }
+        auth.login();
+      } catch (err) {}
     }
-  };
-
-  const errorHandler = () => {
-    setError(null);
   };
 
   return (
     <React.Fragment>
-      <ErrorModal error={error} onClear={errorHandler} />
+      <ErrorModal error={error} onClear={clearError} />
       <Card className="authentication">
         {isLoading && <LoadingSpinner asOverlay />}
         <h2>Login Required</h2>
