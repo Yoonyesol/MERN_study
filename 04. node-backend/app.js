@@ -31,7 +31,7 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    `mongodb+srv://user03:${process.env.DB_PW}@cluster0.mqq5hvg.mongodb.net/places?retryWrites=true&w=majority`
+    `mongodb+srv://user03:${process.env.DB_PW}@cluster0.mqq5hvg.mongodb.net/mern?retryWrites=true&w=majority`
   )
   .then(() => {
     //db 연결이 성공할 경우 서버 연결
