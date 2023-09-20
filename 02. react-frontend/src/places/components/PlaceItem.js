@@ -40,7 +40,7 @@ const PlaceItem = (props) => {
         show={showMap}
         onCancel={closeMapHandler}
         header={props.address}
-        contencClass="place-item__modal-content"
+        contentClass="place-item__modal-content"
         footerClass="place-item__modal-actions"
         footer={<Button onClick={closeMapHandler}>CLOSE</Button>}
       >
@@ -76,8 +76,8 @@ const PlaceItem = (props) => {
           </div>
           <div className="place-item__info">
             <h2>{props.title}</h2>
-            <h2>{props.address}</h2>
-            <h2>{props.description}</h2>
+            <h3>{props.address}</h3>
+            <p>{props.description}</p>
           </div>
           <div className="place-item__actions">
             <Button inverse onClick={openMapHandler}>
