@@ -78,7 +78,27 @@ const login = async (req, res, next) => {
   }
 
   //이메일 존재 여부, 아이디-비밀번호가 일치하는지 검사
-  if (!existingUser || existingUser.password !== password) {
+  if (!existingUser) {
+    const error = new HttpError(
+      "이메일 혹은 비밀번호가 일치하지 않습니다.",
+      401
+    );
+    return next(error);
+  }
+
+  let isValidPassword = false;
+  try {
+    //입력받은 비밀번호와 기존 사용자의 비밀번호 비교
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+  } catch (err) {
+    const error = new HttpError(
+      "일치하지 않는 비밀번호입니다. 다시 확인하고 시도해주세요.",
+      500
+    );
+    return next(error);
+  }
+
+  if (!isValidPassword) {
     const error = new HttpError(
       "이메일 혹은 비밀번호가 일치하지 않습니다.",
       401
