@@ -90,8 +90,8 @@ const Auth = () => {
         //json 형식으로 보내지 못하는 데이터 전송처리 시스템
         const formData = new FormData();
         //formData에 전송 요청할 데이터 추가(파일(이진)데이터도 추가 가능)
-        formData.append("name", formState.inputs.email.value);
-        formData.append("email", formState.inputs.name.value);
+        formData.append("name", formState.inputs.name.value);
+        formData.append("email", formState.inputs.email.value);
         formData.append("password", formState.inputs.password.value);
         formData.append("image", formState.inputs.image.value);
 

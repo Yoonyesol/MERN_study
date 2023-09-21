@@ -1,5 +1,8 @@
 require("dotenv").config();
 
+const fs = require("fs");
+const path = require("path");
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -11,6 +14,9 @@ const HttpError = require("./models/http-error");
 const app = express();
 
 app.use(bodyParser.json());
+
+//요청한 파일을 반환하는 미들웨어. static serving: 요청이 있을 때, 파일을 실행없이 반환만 한다는 의미. 실행 없
+app.use("/uploads/images", express.static(path.join("uploads", "images"))); ///uploads/images폴더를 가리키는 새로운 경로가 구축
 
 //cors 에러 해결
 app.use((req, res, next) => {
@@ -32,6 +38,14 @@ app.use((req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
+  //요청에 파일 존재 시
+  if (req.file) {
+    //파일 삭제
+    fs.unlink(req.file.path, (err) => {
+      console.log(err);
+    });
+  }
+
   if (res.headerSent) {
     return next(error);
   }

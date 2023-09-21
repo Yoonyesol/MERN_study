@@ -38,8 +38,7 @@ const signup = async (req, res, next) => {
   const createdUser = new User({
     name,
     email,
-    image:
-      "https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg",
+    image: req.file.path, //서버 상의 이미지 경로
     password,
     places: [], //새 장소가 추가되면 자동으로 배열에 추가
   });
