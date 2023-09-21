@@ -10,7 +10,7 @@ router.get("/", usersControllers.getUsers);
 
 router.post(
   "/signup",
-  fileUpload.single("image"), //미들웨어 생성
+  fileUpload.single("image"), //미들웨어 생성(이미지를 포함하는 image라는 이름의 요청 본문 키 생성)
   [
     check("name").not().isEmpty(),
     check("email").normalizeEmail().isEmail(),

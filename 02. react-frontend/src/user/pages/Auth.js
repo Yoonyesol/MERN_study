@@ -68,8 +68,6 @@ const Auth = () => {
   const authSubmitHandler = async (e) => {
     e.preventDefault();
 
-    console.log(formState.inputs);
-
     if (isLoginMode) {
       try {
         //auth.login()이 항상 호출되지 않도록 처리
@@ -89,18 +87,19 @@ const Auth = () => {
     } else {
       //로그인 모드가 아닐 때
       try {
+        //json 형식으로 보내지 못하는 데이터 전송처리 시스템
+        const formData = new FormData();
+        //formData에 전송 요청할 데이터 추가(파일(이진)데이터도 추가 가능)
+        formData.append("name", formState.inputs.email.value);
+        formData.append("email", formState.inputs.name.value);
+        formData.append("password", formState.inputs.password.value);
+        formData.append("image", formState.inputs.image.value);
+
         const responseData = await sendRequest(
           "http://localhost:5000/api/users/signup",
           "POST",
-          JSON.stringify({
-            //인증을 위해 전송할 내용
-            name: formState.inputs.name.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
-          }),
-          {
-            "Content-Type": "application/json", //json데이터를 받고 있음을 명시
-          }
+          formData
+          //내부 Fetch api가 자동으로 헤더 추가해줌.
         );
         auth.login();
       } catch (err) {}
