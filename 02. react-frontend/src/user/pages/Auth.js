@@ -40,6 +40,7 @@ const Auth = () => {
         {
           ...formState.inputs,
           name: undefined, //name필드를 제외시킨다
+          image: undefined,
         },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
@@ -52,6 +53,10 @@ const Auth = () => {
             value: "",
             isValid: false,
           },
+          image: {
+            value: null,
+            isValid: false,
+          },
         },
         false //유효성은 false로 초기화
       );
@@ -62,6 +67,8 @@ const Auth = () => {
 
   const authSubmitHandler = async (e) => {
     e.preventDefault();
+
+    console.log(formState.inputs);
 
     if (isLoginMode) {
       try {
@@ -119,7 +126,9 @@ const Auth = () => {
               onInput={inputHandler}
             />
           )}
-          {!isLoginMode && <ImageUpload id="image" center />}
+          {!isLoginMode && (
+            <ImageUpload id="image" center onInput={inputHandler} />
+          )}
           <Input
             element="input"
             id="email"
