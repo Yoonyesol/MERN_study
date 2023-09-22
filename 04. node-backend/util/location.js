@@ -3,12 +3,14 @@ require("dotenv").config();
 const axios = require("axios");
 const HttpError = require("../models/http-error");
 
+const API_KEY = process.env.GOOGLE_API_KEY;
+
 const getCoordsForAddress = async (address) => {
   //axios는 url로 GET 요청을 보냄. 반환값: 주소에 해당하는 좌표
   const response = await axios.get(
     `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
       address
-    )}&key=${process.env.API_KEY}`
+    )}&key=${process.env.GOOGLE_API_KEY}`
   );
 
   const data = response.data;

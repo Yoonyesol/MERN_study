@@ -52,7 +52,11 @@ const NewPlace = () => {
       formData.append("address", formState.inputs.address.value);
       formData.append("creatorId", auth.userId);
       formData.append("image", formState.inputs.image.value);
-      await sendRequest("http://localhost:5000/api/places", "POST", formData);
+      await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/places`,
+        "POST",
+        formData
+      );
       //장소 입력 성공 시 다른 페이지로 리디렉션
       history.push("/");
     } catch (err) {}
