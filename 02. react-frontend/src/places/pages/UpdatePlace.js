@@ -76,6 +76,7 @@ const UpdatePlace = (props) => {
         }),
         {
           "Content-Type": "application/json",
+          Authorization: "Bearer " + auth.token, //헤더에 토큰 정보 포함
         }
       );
       history.push("/" + auth.userId + "/places");
