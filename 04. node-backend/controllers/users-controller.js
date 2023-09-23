@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
@@ -68,7 +69,29 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
+  //유효한 사용자인지 확인하고 토큰 생성
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        userId: createdUser.id,
+        email: createdUser.email,
+      },
+      process.env.REACT_APP_GOOGLE_MAP_API_KEY,
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    const error = new HttpError(
+      "회원가입에 실패했습니다. 재시도 해주세요.",
+      500
+    );
+    return next(error);
+  }
+
+  //프론트엔드로 반환할 데이터
+  res
+    .status(201)
+    .json({ userId: createdUser.id, email: createdUser.email, token: token });
 };
 
 const login = async (req, res, next) => {
@@ -113,10 +136,26 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  //이메일 검증과 비밀번호 검증 모두 통과
+  //이메일 검증과 비밀번호 검증 모두 통과한 경우 토큰 생성
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        userId: existingUser.id,
+        email: existingUser.email,
+      },
+      process.env.REACT_APP_GOOGLE_MAP_API_KEY,
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    const error = new HttpError("로그인에 실패했습니다. 재시도 해주세요.", 500);
+    return next(error);
+  }
+
   res.json({
-    message: "로그인 성공!",
-    user: existingUser.toObject({ getters: true }),
+    userId: existingUser.id,
+    email: existingUser.email,
+    token: token,
   });
 };
 
