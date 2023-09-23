@@ -40,8 +40,8 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
+  let hashedPassword;
   try {
-    let hashedPassword;
     hashedPassword = await bcrypt.hash(password, 12);
   } catch (err) {
     const error = new HttpError(
@@ -77,7 +77,7 @@ const signup = async (req, res, next) => {
         userId: createdUser.id,
         email: createdUser.email,
       },
-      process.env.REACT_APP_GOOGLE_MAP_API_KEY,
+      process.env.JWT_KEY,
       { expiresIn: "1h" }
     );
   } catch (err) {
@@ -144,7 +144,7 @@ const login = async (req, res, next) => {
         userId: existingUser.id,
         email: existingUser.email,
       },
-      process.env.REACT_APP_GOOGLE_MAP_API_KEY,
+      process.env.JWT_KEY,
       { expiresIn: "1h" }
     );
   } catch (err) {
