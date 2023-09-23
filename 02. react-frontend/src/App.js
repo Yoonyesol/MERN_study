@@ -23,13 +23,17 @@ const Auth = React.lazy(() => import("./user/pages/Auth"));
 const UserPlaces = React.lazy(() => import("./places/pages/UserPlaces"));
 
 function App() {
-  const [token, setToken] = useState(null);
-  const [userId, setUserId] = useState(null);
+  const [token, setToken] = useState(false);
+  const [userId, setUserId] = useState(false);
 
   //재생성할 필요 없음, 의존성 빈 배열
   const login = useCallback((uid, token) => {
     setToken(token);
     setUserId(uid);
+    localStorage.setItem(
+      "userData",
+      JSON.stringify({ userId: uid, token: token })
+    );
   }, []);
 
   const logout = useCallback(() => {
