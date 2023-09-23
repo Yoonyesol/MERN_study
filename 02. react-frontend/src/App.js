@@ -27,12 +27,20 @@ function App() {
   const [userId, setUserId] = useState(false);
 
   //재생성할 필요 없음, 의존성 빈 배열
-  const login = useCallback((uid, token) => {
+  const login = useCallback((uid, token, expirationDate) => {
     setToken(token);
     setUserId(uid);
+    //지금으로부터 1시간.
+    //useEffect에서 전달해준 time이 유효하다면 그대로 쓰고 아니면 새로 생성
+    const tokenExpirationDate =
+      expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60);
     localStorage.setItem(
       "userData", //key
-      JSON.stringify({ userId: uid, token: token }) //value
+      JSON.stringify({
+        userId: uid,
+        token: token,
+        expiration: tokenExpirationDate.toISOString(),
+      }) //value
     );
   }, []);
 
@@ -46,8 +54,17 @@ function App() {
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem("userData")); //parse 이용해 객체 등의 일반 js구조로 되돌리기
     //로컬스토리지에 데이터가 있고, 데이터가 있을 경우 token을 확인해서 token이 있다면
-    if (storedData && storedData.token) {
-      login(storedData.userId, storedData.token);
+    //저장된 만료 시각의 Date가 현재 시각인 Date보다 크다면 그 시간동안 이 토큰은 유효하다
+    if (
+      storedData &&
+      storedData.token &&
+      new Date(storedData.expiration) > new Date()
+    ) {
+      login(
+        storedData.userId,
+        storedData.token,
+        new Date(storedData.expiration) //변경사항이 적용되지 않은 원래의 만료시간 스탬프
+      );
     }
   }, [login]);
 
