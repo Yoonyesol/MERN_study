@@ -175,6 +175,12 @@ const deletePlace = async (req, res, next) => {
     return next(error);
   }
 
+  //장소 생성자가 삭제를 요청했는지 확인
+  if (place.creatorId.id !== req.userData.userId) {
+    const error = new HttpError("장소를 삭제할 수 있는 권한이 없습니다.", 401);
+    return next(error);
+  }
+
   const imagePath = place.image;
 
   //장소 삭제

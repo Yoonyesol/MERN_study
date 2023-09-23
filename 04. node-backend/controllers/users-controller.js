@@ -110,7 +110,7 @@ const login = async (req, res, next) => {
   if (!existingUser) {
     const error = new HttpError(
       "존재하지 않는 이메일입니다. 회원가입 해주세요.",
-      401
+      403
     );
     return next(error);
   }
