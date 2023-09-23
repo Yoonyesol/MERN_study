@@ -1,4 +1,5 @@
 const { validationResult } = require("express-validator");
+const bcrypt = require("bcryptjs");
 
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
@@ -26,7 +27,10 @@ const signup = async (req, res, next) => {
   try {
     existingUser = await User.findOne({ email: email });
   } catch (err) {
-    const error = new HttpError("회원가입에 실패했습니다", 500);
+    const error = new HttpError(
+      "회원가입에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+      500
+    );
     return next(error);
   }
 
@@ -35,11 +39,22 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
+  try {
+    let hashedPassword;
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    const error = new HttpError(
+      "회원가입에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+      500
+    );
+    return next(error);
+  }
+
   const createdUser = new User({
     name,
     email,
     image: req.file.path, //서버 상의 이미지 경로
-    password,
+    password: hashedPassword,
     places: [], //새 장소가 추가되면 자동으로 배열에 추가
   });
 
@@ -68,15 +83,37 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  //이메일 존재 여부, 아이디-비밀번호가 일치하는지 검사
-  if (!existingUser || existingUser.password !== password) {
+  //이메일 존재 여부 검사
+  if (!existingUser) {
     const error = new HttpError(
-      "이메일 혹은 비밀번호가 일치하지 않습니다.",
+      "존재하지 않는 이메일입니다. 회원가입 해주세요.",
       401
     );
     return next(error);
   }
 
+  //db에 저장된 비밀번호와 같은지 확인
+  let isValidPassword = false; //처음에 false로 초기화
+  try {
+    //평문 비밀번호(새로 입력받은 비번)와 해시 암호(db에 저장된 비번)를 비교해 isValidPassword에 bool값 저장
+    //두 값이 다르면 isValidPassword=false
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+  } catch (err) {
+    const error = new HttpError(
+      "로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+      500
+    );
+  }
+
+  if (!isValidPassword) {
+    const error = new HttpError(
+      "비밀번호가 일치하지 않습니다. 다시 확인해주세요.",
+      401
+    );
+    return next(error);
+  }
+
+  //이메일 검증과 비밀번호 검증 모두 통과
   res.json({
     message: "로그인 성공!",
     user: existingUser.toObject({ getters: true }),
