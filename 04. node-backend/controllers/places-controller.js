@@ -56,7 +56,7 @@ const createPlace = async (req, res, next) => {
   if (!errors.isEmpty()) {
     return next(new HttpError("입력하지 않은 데이터가 존재합니다.", 422));
   }
-  const { title, description, address, creatorId } = req.body;
+  const { title, description, address } = req.body;
 
   let coordinates;
   try {
@@ -72,13 +72,13 @@ const createPlace = async (req, res, next) => {
     address,
     location: coordinates,
     image: req.file.path,
-    creatorId,
+    creatorId: req.userData.userId, //토큰에서 추출한 유저 값을 가져오기
   });
 
   let user;
   //creatorId의 존재 여부 확인
   try {
-    user = await User.findById(creatorId);
+    user = await User.findById(req.userData.userId);
   } catch (err) {
     const error = new HttpError("creatorId가 존재하지 않습니다.", 500);
     return next(error);
