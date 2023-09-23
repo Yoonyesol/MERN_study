@@ -23,7 +23,7 @@ module.exports = (req, res, next) => {
       token,
       process.env.JWT_KEY
     );
-    req.userData = { userId: decodedToken.userId }; //userData로 사용자 id 추출 가능
+    req.userData = { userId: decodedToken.userId }; //userData로 사용자 id 추출 가능, client에서 조작불가능
     next(); //인증을 요구하는 다른 라우트 중 어디로든 갈 수 있게 함
   } catch (err) {
     const error = new HttpError("인증에 실패했습니다!", 401);

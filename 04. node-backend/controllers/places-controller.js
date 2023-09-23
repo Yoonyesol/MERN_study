@@ -131,6 +131,15 @@ const updatePlace = async (req, res, next) => {
     return next(error);
   }
 
+  //장소 생성자가 아니면 내용 수정 불가
+  if (place.creatorId.toString() !== req.userData.userId) {
+    const error = new HttpError(
+      "장소를 업데이트 할 수 있는 권한이 없습니다.",
+      401 //권한 부여 오류
+    );
+    return next(error);
+  }
+
   //내용 업데이트
   place.title = title;
   place.description = description;
