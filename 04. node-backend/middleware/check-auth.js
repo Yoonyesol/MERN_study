@@ -5,6 +5,11 @@ const jwt = require("jsonwebtoken");
 const HttpError = require("../models/http-error");
 
 module.exports = (req, res, next) => {
+  //서버에게 확인을 위해 보내는 options요청을 차단하지 않도록 처리
+  if (req.method === "OPTIONS") {
+    return next(); //다음 요청 처리하도록
+  }
+
   try {
     //새로 들어온 요청에서 토큰을 추출(헤더에 토큰을 인코딩)
     const token = req.headers.authorization.split(" ")[1]; //Authorization: Bearer token

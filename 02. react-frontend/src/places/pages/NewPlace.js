@@ -55,7 +55,8 @@ const NewPlace = () => {
       await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/places`,
         "POST",
-        formData
+        formData,
+        { Authorization: "Bearer " + auth.token }
       );
       //장소 입력 성공 시 다른 페이지로 리디렉션
       history.push("/");

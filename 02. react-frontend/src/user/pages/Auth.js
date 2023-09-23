@@ -83,7 +83,7 @@ const Auth = () => {
             "Content-Type": "application/json", //json데이터를 받고 있음을 명시
           }
         );
-        auth.login(responseData.userId);
+        auth.login(responseData.userId, responseData.token);
       } catch (err) {} //hook에서 에러처리하므로 빈 상태로 놔둬도 됨
     } else {
       //로그인 모드가 아닐 때
@@ -102,7 +102,7 @@ const Auth = () => {
           formData
           //내부 Fetch api가 자동으로 헤더 추가해줌.
         );
-        auth.login(responseData.userId);
+        auth.login(responseData.userId, responseData.token);
       } catch (err) {}
     }
   };

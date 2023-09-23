@@ -23,23 +23,23 @@ const Auth = React.lazy(() => import("./user/pages/Auth"));
 const UserPlaces = React.lazy(() => import("./places/pages/UserPlaces"));
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [token, setToken] = useState(null);
   const [userId, setUserId] = useState(null);
 
   //재생성할 필요 없음, 의존성 빈 배열
-  const login = useCallback((uid) => {
-    setIsLoggedIn(true);
+  const login = useCallback((uid, token) => {
+    setToken(token);
     setUserId(uid);
   }, []);
 
   const logout = useCallback(() => {
-    setIsLoggedIn(false);
+    setToken(null);
     setUserId(null);
   }, []);
 
   let routes;
 
-  if (isLoggedIn) {
+  if (token) {
     routes = (
       <Switch>
         <Route path="/" exact>
@@ -77,7 +77,8 @@ function App() {
   return (
     <AuthContext.Provider
       value={{
-        isLoggedIn: isLoggedIn,
+        isLoggedIn: !!token, //토큰 없으면 false(로그인 여부)
+        token: token, //토큰 객체
         userId: userId,
         login: login,
         logout: logout,
