@@ -1,4 +1,4 @@
-import React, { useState, useCallback, Suspense } from "react";
+import React, { useState, useCallback, Suspense, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -31,15 +31,25 @@ function App() {
     setToken(token);
     setUserId(uid);
     localStorage.setItem(
-      "userData",
-      JSON.stringify({ userId: uid, token: token })
+      "userData", //key
+      JSON.stringify({ userId: uid, token: token }) //value
     );
   }, []);
 
   const logout = useCallback(() => {
     setToken(null);
     setUserId(null);
+    localStorage.removeItem("userData"); //로컬스토리지에서 데이터 삭제
   }, []);
+
+  //로컬 스토리지를 확인해 자동 로그인
+  useEffect(() => {
+    const storedData = JSON.parse(localStorage.getItem("userData")); //parse 이용해 객체 등의 일반 js구조로 되돌리기
+    //로컬스토리지에 데이터가 있고, 데이터가 있을 경우 token을 확인해서 token이 있다면
+    if (storedData && storedData.token) {
+      login(storedData.userId, storedData.token);
+    }
+  }, [login]);
 
   let routes;
 
