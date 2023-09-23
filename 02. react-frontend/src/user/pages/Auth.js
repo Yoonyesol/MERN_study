@@ -34,6 +34,7 @@ const Auth = () => {
     },
     false
   );
+
   const switchModeHandler = () => {
     if (!isLoginMode) {
       setFormData(
@@ -101,7 +102,7 @@ const Auth = () => {
           formData
           //내부 Fetch api가 자동으로 헤더 추가해줌.
         );
-        auth.login();
+        auth.login(responseData.user.id);
       } catch (err) {}
     }
   };

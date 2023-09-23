@@ -60,7 +60,7 @@ mongoose
   )
   .then(() => {
     //db 연결이 성공할 경우 서버 연결
-    app.listen(5000);
+    app.listen(process.env.PORT || 5000);
   })
   .catch((err) => {
     console.log(err);
